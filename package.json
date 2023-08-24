@@ -1,0 +1,40 @@
+{
+  "name": "@clw233/getdep",
+  "version": "1.0.1",
+  "description": "Get Node.js Package Dependencies Analyzed",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "test": "jest dist"
+  },
+  "bin": {
+    "getdep": "dist/index.js"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@types/jest": "^29.5.4",
+    "@types/node": "^20.5.0",
+    "@types/yargs": "^17.0.24",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "jest": "^29.6.3",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "yargs": "^17.7.2"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clw233/getdep.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clw233/getdep/issues"
+  },
+  "homepage": "https://github.com/clw233/getdep#readme"
+}

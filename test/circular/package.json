@@ -1,0 +1,10 @@
+{
+  "name": "circular-test",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "circular-test-a": "0"
+  }
+}
