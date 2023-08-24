@@ -167,6 +167,158 @@ yargs(hideBin(process.argv))
     if (yargs.argv.json) {
       //@ts-ignore
       fs.writeFileSync(yargs.argv.json, JSON.stringify(result));
+    } else {
+      const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>getdep</title>
+    <link
+      href="https://unpkg.com/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <style>
+      .card {
+        margin: 1em 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-9">
+          <div id="container" class="card" style="overflow: hidden"></div>
+        </div>
+        <div id="data" class="col-3">
+          <noscript>
+            <div class="card border-warning">
+              <div class="card-header text-bg-warning">启用 JavaScript</div>
+              <div class="card-body">
+                <p class="card-text">
+                  如果没有 JavaScript，程序将不能正常运行。
+                </p>
+              </div>
+            </div>
+          </noscript>
+          <div class="card">
+            <div class="card-header">包信息</div>
+            <div class="card-body">
+              <p class="card-text">名称：<span id="packagename"></span></p>
+              <p class="card-text">版本：<span id="packagever"></span></p>
+              <p class="card-text">
+                依赖包总数：<span id="packagecount"></span>
+              </p>
+              <p class="card-text">
+                循环依赖：<span id="packagecircular"></span>
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">依赖</div>
+            <div class="card-body">
+              <p class="card-title">从图中选择一项来查看详情。</p>
+              <p class="card-text">名称：<span id="currentname"></span></p>
+              <p class="card-text">版本：<span id="currentver"></span></p>
+              <p class="card-text">
+                被引用次数：<span id="currentrequire"></span>
+              </p>
+              <p class="card-text">
+                循环依赖：<span id="currentcircular"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <script>
+      const dependenciesData = ${JSON.stringify(result)}
+      const dependenciesMap = dependenciesData.map;
+      const nodes = Object.entries(dependenciesMap).map((e) => ({
+        id: e[0],
+        label: e[0]+' ('+e[1].version+')',
+      }));
+      const edges = Object.entries(dependenciesMap)
+        .map((e) =>
+          Object.entries(e[1].dependencies).map((f) => {
+            const obj = { source: e[0], target: f[0] };
+            if (f[1] != dependenciesMap[f[0]].version) {
+              obj.color = 'red';
+            }
+            return obj;
+          })
+        )
+        .flat();
+      const data = { nodes, edges };
+      var container = document.getElementById('container');
+      var width = container.clientWidth;
+      var height = window.innerHeight - 32;
+      const graph = new G6.Graph({
+        container: 'container',
+        width: width,
+        height: height,
+        defaultNode: { size: [80, 80] },
+        defaultEdge: { type: 'line', style: { endArrow: true } },
+        modes: { default: ['drag-node', 'drag-canvas', 'zoom-canvas'] },
+        layout: {
+          type: 'dagre',
+          nodesep: 32,
+          ranksep: 32,
+          controlPoints: true,
+        },
+        fitView: true,
+        fitViewPadding: [20, 20, 20, 20],
+      });
+      graph.on('node:click', (e) => {
+        var item = dependenciesMap[e.item._cfg.id];
+        document.getElementById('currentrequire').innerText =
+          item.requiredTimes;
+        document.getElementById('currentname').innerText = e.item._cfg.id;
+        document.getElementById('currentver').innerText = item.version;
+        document.getElementById('currentcircular').innerText = item.circular
+          ? '是'
+          : '否';
+      });
+      graph.data(data);
+      graph.render();
+      document.getElementById('packagename').innerText = dependenciesData.name;
+      document.getElementById('packagever').innerText =
+        dependenciesData.version;
+      document.getElementById('packagecount').innerText =
+        dependenciesData.count;
+      document.getElementById('packagecircular').innerText =
+        dependenciesData.hasCircularDependency ? '有' : '无';
+      function redraw() {
+        var container = document.getElementById('container');
+        var width = container.clientWidth;
+        var height = 800;
+        graph.changeSize(width, height);
+        graph.render();
+        console.log('Redrawing...');
+      }
+      function throttle(callback, delay) {
+        let timer = null;
+        return function () {
+          if (timer) {
+            return;
+          }
+          timer = setTimeout(function () {
+            timer = null;
+            callback.apply(this, arguments);
+          }, delay);
+        };
+      }
+      var throttleRedraw = throttle(redraw, 100);
+      window.addEventListener('resize', throttleRedraw);
+    </script>
+  </body>
+</html>
+`;
+      fs.writeFileSync('package.json.html', html);
+      require('better-opn')('package.json.html');
     }
   })
   .help(false)
