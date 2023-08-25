@@ -1,6 +1,6 @@
 {
   "name": "@clw233/getdep",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Get Node.js Package Dependencies Analyzed",
   "main": "index.js",
   "scripts": {
@@ -23,8 +23,8 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "better-opn": "^3.0.2",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+    "open-browsers": "^1.3.0"
   },
   "directories": {
     "test": "test"

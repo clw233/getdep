@@ -1,0 +1,11 @@
+{
+  "name": "normal-test",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "normal-test-x": "0",
+    "normal-test-y": "1"
+  }
+}
